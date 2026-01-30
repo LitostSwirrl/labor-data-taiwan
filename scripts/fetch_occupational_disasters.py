@@ -141,7 +141,7 @@ def main():
     df.index = df.index + 1
     df.index.name = "編號"
 
-    # 匯出 CSV
+    # 匯出合併 CSV
     output_file = PROCESSED_DIR / "重大職業災害_2018至今.csv"
     df.to_csv(output_file, encoding="utf-8-sig")
 
@@ -153,12 +153,18 @@ def main():
     print(f"資料期間: {df['年度'].min()} ~ {df['年度'].max()}")
     print("=" * 60)
 
-    # 顯示統計
+    # 輸出各年度檔案
     print()
     print("各年度資料筆數:")
     year_counts = df["年度"].value_counts().sort_index()
     for year, count in year_counts.items():
-        print(f"  {year}: {count} 筆")
+        year_df = df[df["年度"] == year].copy()
+        year_df = year_df.reset_index(drop=True)
+        year_df.index = year_df.index + 1
+        year_df.index.name = "編號"
+        year_file = PROCESSED_DIR / f"重大職業災害_{year}.csv"
+        year_df.to_csv(year_file, encoding="utf-8-sig")
+        print(f"  {year}: {count} 筆 → {year_file.name}")
 
 
 if __name__ == "__main__":
